@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="images/favicon.ico" type="image/ico" />
+
+    <title> 我的聊天室 </title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <!-- bootstrap-daterangepicker -->
+    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+</head>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                    <a href="/" class="site_title"><i class="fa fa-paw"></i> <span>聊天室</span></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile clearfix">
+                    <div class="profile_pic">
+                        <img src="<?php echo $login_user['avatar'];?>" alt="更换头像" class="img-circle profile_img">
+                    </div>
+                    <div class="profile_info">
+                        <h2><?php echo $login_user['name'] ?></h2>
+                        <span title="<?php echo $login_user['feel']?$login_user['feel']:'...';?>"><?php echo strlen($login_user['feel'])>8?substr($login_user['feel'],0,8):$login_user['feel']?></span>
+                    </div>
+                </div>
+                <!-- /menu profile quick info -->
+
+                <br />
+
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                        <h3>好友列表</h3>
+                        <ul class="nav side-menu">
+                            <?php foreach ($groups as $value):?>
+                                <li><a><i class="fa fa-user group-list" data-id=<?php echo $value['id']?>></i> <?php echo $value['name'];?> （<span class="group-online-<?php echo $value['id']?>"><?php echo $friends[$value['id']]['on_lines_num']?></span>/<span class="group-total-<?php echo $value['id']?>"><?php echo $friends[$value['id']]['total_num']?></span>）<span class="fa fa-chevron-down"></span><span><?php if( $text_nums[$value['id']]>0):?><i class="fa fa-envelope-o"></i><?php echo $text_nums[$value['id']];endif;?></span></a>
+                                    <ul class="nav child_menu friend-group-<?php echo $value['id']?>">
+                                        <?php if(!empty($friends[$value['id']]['on_lines'])):?>
+                                            <?php foreach ($friends[$value['id']]['on_lines'] as $id=>$friend) :?>
+                                                <li class="user-profile group-friend-<?php echo $friend['friend_user_id']?>">
+                                                    <a class="chat-friend" data-friend-id="<?php echo $friend['friend_user_id']?>">
+                                                        <span class="image"><img src="<?php echo $friend['avatar']?>"></span>
+                                                        <span title="<?php echo $friend['name'];?>"><?php echo $friend['remark']?></span>
+                                                        <span>（在线）</span>
+                                                    </a>
+                                                </li>
+                                            <?php endforeach;?>
+                                        <?php endif;?>
+                                        <?php if(!empty($friends[$value['id']]['off_lines'])):?>
+                                            <?php foreach ($friends[$value['id']]['off_lines'] as $id=>$friend) :?>
+                                                <li class="user-profile group-friend-<?php echo $friend['friend_user_id']?>">
+                                                    <a class="chat-friend" data-friend-id="<?php echo $friend['friend_user_id']?>">
+                                                        <span class="image"><img src="<?php echo $friend['avatar']?>"></span>
+                                                        <span title="<?php echo $friend['name'];?>"><?php echo $friend['remark']?></span>
+                                                        <span>（离线）</span>
+                                                    </a>
+                                                </li>
+                                            <?php endforeach;?>
+                                        <?php endif;?>
+                                    </ul>
+                                </li>
+                            <?php endforeach;?>
+                        </ul>
+                    </div>
+                    <div class="menu_section">
+                        <h3>我的群聊</h3>
+                        <ul class="nav side-menu">
+
+                        </ul>
+                    </div>
+                </div>
+                <!-- /sidebar menu -->
+
+                <!-- /menu footer buttons -->
+                <div class="sidebar-footer hidden-small">
+                    <a data-toggle="tooltip" data-placement="top" title="设置" href="javascript:;">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="add-friends" data-placement="top" title="添加好友" href="javascript:;">
+                        <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="修改密码" href="javascript:;">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="退出" href="javascript:;">
+                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                    </a>
+                </div>
+                <!-- /menu footer buttons -->
+            </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+            <div class="nav_menu">
+                <nav>
+                    <div class="nav toggle">
+                        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                    </div>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="">
+                            <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <img src="<?php echo $login_user['avatar'];?>" alt=""><?php echo $login_user['name'];?>
+                                <span class=" fa fa-angle-down"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                <li class="add-friends"><a href="javascript:;" >添加好友</a></li>
+                                <li><a href="javascript:;">修改密码</a></li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge bg-red pull-right"><?php echo $login_user['info_rate'];?>%</span>
+                                        <span>设置</span>
+                                    </a>
+                                </li>
+                                <li><a href="javascript:;"><i class="fa fa-sign-out pull-right"></i>退出</a></li>
+                            </ul>
+                        </li>
+
+                        <li role="presentation" class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-envelope-o"></i>
+                                <span class="badge bg-green user-apply-num" <?php if ($applyNum==0):?>style="display: none;" <?php endif;?> ><?php echo $applyNum;?></span>
+                            </a>
+                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list user-apply-list" role="menu" >
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+        </div>
+        <?php include PUBLIC_PATH.'static/windows/user/search.phtml'?>
+        <?php include PUBLIC_PATH.'static/windows/user/search_users.phtml'?>
+        <?php include PUBLIC_PATH.'static/windows/user/addfriens.phtml'?>
+        <?php include PUBLIC_PATH.'static/windows/user/add-apply.phtml'?>
+        <?php include PUBLIC_PATH.'static/windows/user/look_apply.phtml'?>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <input type="hidden" value="<?php echo $login_user['id'];?>" id="login_user_id">
+        <footer>
+            <div class="pull-right">
+                聊天室创作人—— <a href="#">东</a>
+            </div>
+            <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="/static/vendors/nprogress/nprogress.js"></script>
+<!-- Chart.js -->
+<script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
+<!-- gauge.js -->
+<script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
+<!-- bootstrap-progressbar -->
+<script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<!-- iCheck -->
+<script src="/static/vendors/iCheck/icheck.min.js"></script>
+<!-- Skycons -->
+<script src="/static/vendors/skycons/skycons.js"></script>
+<!-- Flot -->
+<script src="/static/vendors/Flot/jquery.flot.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.time.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
+<!-- Flot plugins -->
+<script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+<script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+<script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
+<!-- DateJS -->
+<script src="/static/vendors/DateJS/build/date.js"></script>
+<!-- JQVMap -->
+<script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+<script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+<script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="/static/vendors/moment/min/moment.min.js"></script>
+<script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="/static/build/js/custom.min.js"></script>
+
+
+</body>
+</html>
+
+<script>
+    let user_id = $("#login_user_id").val();
+    let ws = new WebSocket("ws://swoole.cddong.top:8500?user_id=" + user_id);//连接服务器
+    (
+        function() {
+        link();
+        get_apply_lists();
+        $(".add-friends").click(function () {
+            $('#modal-search-friends').modal('show');
+        });
+        $("#search-friends-button").click(function () {
+            var searchStr = $("#user-search-str").val();
+            var search_status = search_user(searchStr);
+            if(search_status == true){
+                $('#modal-search-friends').modal('hide');
+                $('#modal-search-friends-result').modal('show');
+            }
+        });
+        $("#search-user-down").click(function () {
+            var searchStr = $("#user-search-str").val();
+            var page = $(this).attr('data-page');
+            search_user(searchStr,page);
+
+        });
+        $("#search-user-up").click(function () {
+            var searchStr = $("#user-search-str").val();
+            var page = $(this).attr('data-page');
+            search_user(searchStr,page);
+        });
+        $("#add-friends-button").click(function () {
+            var friend_id = $("#add-friend-user_id").val();
+            var group_id = $("#add-friend-group_id").val();
+            var reson = $("#add-friend-reason").val();
+            var remark = $("#add-friend-remark").val();
+            let msg = {
+                friend_id : friend_id,
+                group_id : group_id,
+                reason : reson,
+                friend_remark : remark,
+                quest_type : 'add_apply'
+            };
+            ws.send(JSON.stringify(msg));
+            $("#modal-add-friends").modal('hide');
+        });
+        $("#add-friend-deal-select").change(function () {
+            var deal = $(this).val();
+            if(deal == 0){
+                $(".add-friend-deal").attr('style','display:none;');
+                $(".add-friend-no-deal").attr('style','display:block;');
+            }else{
+                $(".add-friend-deal").attr('style','display:block;');
+                $(".add-friend-no-deal").attr('style','display:none;');
+            }
+        });
+
+        $(".info-number").click(function () {
+            $(".user-apply-num").attr('style','display:none;');
+        });
+
+        $("#add-friends-deal-button").click(function () {
+           var id = $("#add-friend-deal-id").val();
+           var status = $("#add-friend-deal-select").val();
+           if(status == 0){
+               var reason = $("#add-deal-reason").val();
+               let msg = {
+                   apply_id : id,
+                   reason : reason,
+                   quest_type : 'apply_refuse'
+               };
+               ws.send(JSON.stringify(msg));
+           }else {
+               var group_id = $("#add-deal-group_id").val();
+               var remark = $("#add-deal-remark").val();
+               let msg = {
+                   apply_id : id,
+                   group_id : group_id,
+                   friend_remark : remark,
+                   quest_type : 'apply_deal'
+               };
+               ws.send(JSON.stringify(msg));
+           }
+            $("#modal-deal-add-friends").modal('hide');
+        });
+
+    })();
+
+    function link () {
+        ws.onopen = function(event){
+            console.log('连接成功！');
+        };
+        ws.onmessage = function (event) {
+            var data = JSON.parse(event.data);
+            switch (data.type) {
+                case 'error':
+                    alert(data.data.msg);
+                    break;
+                case 'client':
+                    console.log(data.data.msg);
+                    break;
+                case 'apply':
+                    $(".user-apply-num").html(data.data.apply_num);
+                    $(".user-apply-num").attr('style','display: block;');
+                    get_apply_lists();
+                    break;
+                case 'add_friend':
+                    console.log(data.data);
+                    break;
+                case 'chat':
+                    console.log(data.data);
+                    break;
+            }
+        };
+        ws.onclose = function(event){
+            alert("服务器错误！");
+        };
+
+        ws.onerror = function(event){
+            alert("WebSocket异常！");
+        };
+    }
+
+    function get_apply_lists() {
+        var limit = $(".user-apply-num").html();
+        $(".user-apply-list").empty();
+        $.get('/api/user/applylist?limit='+limit,function (returnjson) {
+            var html = '';
+            if(returnjson.status == false){
+                return false;
+            }
+            var endHtml = '';
+            if(returnjson.data.total>limit){
+                endHtml = "<li>\n" +
+                    "    <div class=\"text-center\">\n" +
+                    "        <a>\n" +
+                    "            <strong onclick='more_apply_lists()'>查看更多</strong>\n" +
+                    "            <i class=\"fa fa-angle-right\"></i>\n" +
+                    "        </a>\n" +
+                    "    </div>\n" +
+                    "</li>";
+            }
+            $.each(returnjson.data.lists,function(index,value){
+                html += "<li>\n" +
+                    "    <a onclick='apply_look("+value.id+","+ value.is_reply +")'>\n" +
+                    "        <span class=\"image\"><img src=\""+ value.user_avatar +"\" alt=\"" + value.user_name + "\" /></span>\n" +
+                    "        <span>\n" +
+                    "                          <span>"+value.user_name+"</span>\n" +
+                    "                          <span class=\"time\">"+value.update_at+"</span>\n" +
+                    "                        </span>\n" +
+                    "        <span class=\"message\">\n" +
+                    "                         "+value.msg+"\n" +
+                    "                        </span>\n" +
+                    "    </a>\n" +
+                    "</li>";
+            });
+            html += endHtml;
+            $(".user-apply-list").html(html);
+        });
+
+    }
+
+    function search_user(searchStr,page=1) {
+        $("#search-user-result").empty();
+        $("#search-user-error").empty();
+        var status = true;
+        //关闭异步
+        $.ajaxSettings.async = false;
+        $.post('/api/user/search',{searchStr:searchStr,page:page},function (returnJson) {
+            if(returnJson.status == false){
+                $("#search-user-error").attr("style","display:block;color: red;");
+                $("#search-user-error").html("<div class=\"col-sm-10\">\n" + returnJson.msg +
+                    "                            </div>");
+                status = false;
+            }else {
+                $("#search-user-total").html("<span >总数："+ returnJson.data.total +"条</span>");
+                if(returnJson.data.pages > 1){
+                    $("#search-user-total").attr("style","display:block;");
+                    $("#search-user-page").html("<span >第"+ returnJson.data.page +"页</span>");
+                    if(returnJson.data.pages >1){
+                        $("#search-user-page").attr("style","display:block;");
+                    }else{
+                        $("#search-user-page").attr("style","display:none;");
+                    }
+                    if(returnJson.data.pages - returnJson.data.page > 0){
+                        $("#search-user-down").attr("style","display:block;");
+                        $("#search-user-down").attr("data-page",returnJson.data.page*1 + 1);
+                    }else{
+                        $("#search-user-down").attr("style","display:none;");
+                    }
+                    if(returnJson.data.page  > 1){
+                        $("#search-user-up").attr("style","display:block;");
+                        $("#search-user-up").attr("data-page",returnJson.data.page*1 - 1);
+                    }else{
+                        $("#search-user-up").attr("style","display:none;");
+                    }
+                }else{
+                    $("#search-user-total").attr("style","display:none;");
+                }
+                var str = '';
+                $.each(returnJson.data.users,function(index,value){
+                    str += "<div class=\"form-group\"><label class=\"col-sm-2 control-label\">"+ value.id +"</label>\n" +
+                        "<label class=\"col-sm-2 control-label\">"+ value.user_name +"</label>\n" +
+                        "<label class=\"col-sm-2 control-label\">"+ value.name +"</label>\n" +
+                        "<div class=\"col-sm-4\">\n" +
+                        "    <button type=\"button\" class=\"btn btn-default pull-right\" onclick='show_add_friend("+value.id+")'>添加好友</button>\n" +
+                        "</div></div>";
+                });
+                $("#search-user-result").html(str);
+            }
+        });
+        return status;
+    }
+    
+    function show_add_friend(friend_id) {
+        $('#modal-search-friends-result').modal('hide');
+        $("#add-friend-user_id").val(friend_id);
+        $("#modal-add-friends").modal('show');
+    }
+
+    function apply_look(id , is_replay){
+        $.post('/api/user/look_apply?id='+id,function (returnJson) {
+            if(returnJson.status == false){
+                alert(returnJson.msg);
+            }
+            $(".apply-look-text").html(returnJson.data.msg);
+        });
+        if(is_replay>0){
+            $("#modal-look-text").modal('show');
+        }else {
+            $("#add-friend-deal-id").val(id);
+            $("#modal-deal-add-friends").modal('show');
+        }
+    }
+
+    function more_apply_lists() {
+        console.log('more');
+    }
+</script>
