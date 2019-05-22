@@ -14,7 +14,7 @@ class index extends base {
 
     public function index(){
         $users = [1,2,3,4,5,6,7,8,9,10];
-        $business = new Niuniu(1001);
+        $business = new Tripleton(1001);
         $pokers = $business->deal($users);
         return $this->success('成功',$pokers);
     }
